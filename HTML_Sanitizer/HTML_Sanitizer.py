@@ -1,9 +1,7 @@
 import os, sys, logging
-# Menu, allow for the following:
-# 1. Specifiy a specific file to clean
-# 2. Clean all HTML files in directory (w/o subdirectories?)
+import re
 
-# Color. There is a better way to do this...
+
 MAGENTA = "\033[35m"
 GRAY = "\033[90m"
 RESET = "\x1b[0m"
@@ -15,11 +13,39 @@ log = logging.basicConfig(
     level=logging.DEBUG
 )
 
-def specific_file(files:list):
-    pass
+def clean_file(file: str, remove_styles: bool) -> str:
+    '''
+    Function will provide a fully cleaned HTML file.
 
-def files_in_directory(files:list):
-    pass
+    :param file: File content
+    :param remove_styles: Should "styles=..." be removed from <p>, <td> etc.
+    '''
+
+
+
+    return ""
+
+def specific_file():
+    file_name = input("Please provide the file name: ")
+    logging.debug(f"File provided {file_name}")
+
+    # Remove the file extention if there is one
+    file_name = os.path.splitext(file_name)[0]
+
+    # An exception is thrown if failed to open. file is valid
+    parsed_file = clean_file(file_name, True)
+
+    # Write to file
+    file = open(file_name + ".html", "wt")
+    file.write(parsed_file)
+
+
+def files_in_directory():
+    # Collect files to consider for cleaning. No subdirectories
+    files = os.listdir('.')
+    file_length = len(files)
+    logging.debug(f"Files: {files}\tLength: {file_length}")
+
 
 # User selection
 selection = 0
@@ -42,26 +68,18 @@ while (loop):
     except ValueError:
         print("Please enter a number.")
     except Exception as e:
-        print(f"Unknown error: {e}")
+        logging.warning(f"Unknown error: {e}")
         exit(1)
-
-# Collect files to consider for cleaning. No subdirectories
-files = os.listdir('.')
-file_length = len(files)
-logging.debug(f"Files: {files}Length: {file_length}")
 
 match selection:
     # Choose specific file
     case 1:
-        specific_file(files)
-        files = input("Please provide the file name: ")
-
-        pass
+        specific_file()
 
     # Choose all HTML
     case 2:
-        pass
-    
+        files_in_directory()
+
     case _:
-        print("You should not be here...")
+        logging.warning("You should not be here...")
         exit(0)
