@@ -15,7 +15,12 @@ log = logging.basicConfig(
 
 def clean_quotation(content: str) -> str:
     logging.debug(f"\nBefore clean_quotation:\n{content}")
-    return re.sub(r'&[lr].*?;', '"', content)
+
+    # Replace double quotations
+    temp = re.sub(r'&[lr]d.*?;', '"', content)
+
+    # Replace single quotations
+    return re.sub(r'&[lr]s.*?;', "'", temp)
 
 
 def clean_file(file_name: str, remove_styles: bool) -> str:
