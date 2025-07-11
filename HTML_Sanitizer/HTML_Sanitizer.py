@@ -22,19 +22,39 @@ def clean_quotation(content: str) -> str:
     # Replace single quotations
     return re.sub(r'&[lr]s.*?;', "'", temp)
 
+def clean_span(content: str) -> str:
+    logging.debug(f"\nBefore clean_span:\n{content}")
 
-def clean_file(file_name: str, remove_styles: bool) -> str:
+    # Remove all span but not it's content
+    return re.sub(r'<span.*?>(.+?)<\/span>', r'\1', content)
+
+def clean_style(content: str) -> str:
+    logging.debug(f"\nBefore clean_style:\n{content}")
+
+    # Remove all styles but leave the HTML element
+    # Tested for <p> <li> <ol>
+    return re.sub(r'(<[pul][ li]).*?>(.*?)(<\/.*>)', r'\1>\2\3', content)
+
+def clean_p_space(content: str) -> str:
+    logging.debug(f"\nBefore clean_p_space:\n{content}")
+
+    # Remove the paragraph with only a space there
+    return re.sub(r'<p >?&nbsp;</p>', '', content, flags=re.M)
+
+def clean_file(file_name: str) -> str:
     '''
     Function will provide a fully cleaned HTML file.
 
     :param file_name: File content
-    :param remove_styles: Should "styles=..." be removed from <p>, <td> etc.
     '''
 
     file = open(file_name, "rt")
 
     content = file.read()
     content = clean_quotation(content)
+    content = clean_span(content)
+    content = clean_style(content)
+    content = clean_p_space(content)
 
     logging.debug(f"\nCleaned Return: {content}\n")
 
@@ -55,11 +75,16 @@ def specific_file():
             # file_name = os.path.splitext(file_name)[0]
 
             # An exception is thrown if failed to open.
-            parsed_file = clean_file(file_name, True)
+            parsed_file = clean_file(file_name)
 
             # Write to file
-            file = open(file_name, "wt")
+            # file = open(file_name, "wt")
+            # file.write(parsed_file)
+
+            # WHILE IN TESTING, only save to temp.html
+            file = open("temp.html", "wt")
             file.write(parsed_file)
+            # WHILE IN TESTING
 
             loop = False
         except FileNotFoundError as e:
