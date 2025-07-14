@@ -32,6 +32,12 @@ def clean_span(content: str) -> str:
     return re.sub(r'<span.*?>(.+?)<\/span>', r'\1', content)
 
 
+def clean_space(content: str) -> str:
+
+    # Replace spaces
+    return re.sub(r'&nbsp;', ' ', content)
+
+
 def clean_style_1(content: str) -> str:
     logging.debug(f"Before clean_style_1:\n{content}")
 
@@ -59,12 +65,23 @@ def clean_style_2(content: str) -> str:
 
     return temp
 
+def clean_miscellaneous(content: str) -> str:
+    logging.debug(f"Before clean_miscellaneous:\n{content}")
+
+    # Remove hyperlinks entirely
+    temp = re.sub(r'<a.*?></a>', '', content)
+
+    # Remove table settings, dosen't work if styles spills over to new line...
+    temp = re.sub(r'(<table).*?>', r'\1>', temp)
+
+    return temp
+
 
 def clean_p_space(content: str) -> str:
     logging.debug(f"Before clean_p_space:\n{content}")
 
     # Remove the paragraph with only a space there
-    return re.sub(r'<p>?&nbsp;</p>', '', content, flags=re.M)
+    return re.sub(r'<p>? </p>', '', content, flags=re.M)
 
 
 def clean_file(file_name: str) -> str:
@@ -80,8 +97,10 @@ def clean_file(file_name: str) -> str:
     content = file.read()
     content = clean_quotation(content)
     content = clean_span(content)
+    content = clean_space(content)
     content = clean_style_1(content)
     content = clean_style_2(content)
+    content = clean_miscellaneous(content)
     content = clean_p_space(content)
 
     logging.debug(f"\nCleaned Return: {content}\n")
