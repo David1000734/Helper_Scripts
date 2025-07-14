@@ -71,8 +71,8 @@ def clean_miscellaneous(content: str) -> str:
     # Remove hyperlinks entirely
     temp = re.sub(r'<a.*?></a>', '', content)
 
-    # Remove table settings, dosen't work if styles spills over to new line...
-    temp = re.sub(r'(<table).*?>', r'\1>', temp)
+    # Remove table settings
+    temp = re.sub(r'(<table)[^>]*>', r'\1>', temp, flags=re.DOTALL)
 
     return temp
 
